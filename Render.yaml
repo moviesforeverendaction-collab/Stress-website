@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: devicestress
+    env: python
+    plan: free
+    repo: https://github.com/moviesforeverendaction-collab/Stress-website
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --worker-class sync -w 2 --bind 0.0.0.0:$PORT --timeout 120 --access-logfile - --error-logfile - --keep-alive 30 app:app
+    healthCheckPath: /api/ping
+    healthCheckInterval: 30
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PING_INTERVAL
+        value: "300"
+      - key: APP_URL
+        fromService:
+          type: web
+          property: url
+      - key: MAX_WORKERS
+        value: "2"
+      - key: LOG_LEVEL
+        value: INFO
